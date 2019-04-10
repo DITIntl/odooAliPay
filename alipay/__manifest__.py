@@ -15,7 +15,7 @@
         # 'security/ir.model.access.csv',
         'security/alipay_groups.xml',
         'views/menu.xml',
-        # 'views/res_config_settings_views.xml',
+        'views/res_config_settings_views.xml',
     ],
 
 }
