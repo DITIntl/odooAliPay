@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <menuitem name="支付宝"
+                  id="alipay.main_menu"
+                  web_icon="alipay,static/description/icon.png"/>
+
+        <menuitem name="设置" id="alipay.configure_menu"
+                  parent="alipay.main_menu" sequence="100"
+        />
+
+    </data>
+</odoo>
