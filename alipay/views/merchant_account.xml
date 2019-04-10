@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="alipay_merchant_account_tree_view" model="ir.ui.view">
+        <field name="name">商户账号</field>
+        <field name="model">alipay.merchant.account</field>
+        <field name="arch" type="xml">
+            <tree default_order="id desc" editable="top" create="true">
+                <field name="name"/>
+                <field name="account"/>
+                <field name="uid"/>
+                <field name="pwd"/>
+                <field name="company_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="alipay_merchant_account_action">
+        <field name="name">商户账号</field>
+        <field name="res_model">alipay.merchant.account</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record model="ir.ui.view" id="alipay_merchant_account_search">
+        <field name="model">alipay.merchant.account</field>
+        <field name="arch" type="xml">
+            <search string="商户账号">
+                <field name="name"/>
+                <field name="account"/>
+                <field name="uid"/>
+                <field name="company_id"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="alipay_merchant_account_menu" name="商户账号列表"
+              parent="alipay.configure_menu"
+              sequence="2"
+              action="alipay_merchant_account_action"
+              groups="alipay.alipay_manager_group"
+    />
+
+</odoo>

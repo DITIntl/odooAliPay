@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+		<!--系统参数列表-->
+		<record id="ali_dindin_system_conf_token" model="alipay.system.conf">
+			<field name="name">用户授权url地址</field>
+			<field name="key">oauth2_url</field>
+			<field name="value">https://openauth.alipaydev.com/oauth2/publicAppAuthorize.htm</field>
+		</record>
+
+    </data>
+</odoo>
