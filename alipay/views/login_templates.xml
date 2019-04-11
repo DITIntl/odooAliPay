@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="alipay.login" inherit_id="web.login" name="AliPay Login">
+        <xpath expr="//button[@type='submit']" position="after">
+            <div class="justify-content-between mt-2 d-flex small">
+                <a t-attf-href="/web/alipay/login">支付宝扫码登录</a>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

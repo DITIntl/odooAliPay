@@ -53,10 +53,10 @@
                         </div>
                         <div class="col-12 col-lg-12 o_setting_box">
                             <div class="o_setting_right_pane">
-                                <field name="alipay_rsa2" placeholder="RSA2(SHA256)密钥！"/>
+                                <field name="alipay_sign" placeholder="应用私钥!"/>
                             </div>
                             <div class="o_setting_right_pane">
-                                <label for="alipay_rsa2"/>
+                                <label for="alipay_sign"/>
                                 <div class="text-muted">
                                 </div>
                             </div>

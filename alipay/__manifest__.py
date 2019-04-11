@@ -19,6 +19,7 @@
         'views/res_config_settings_views.xml',
         'views/merchant_account.xml',
         'views/system_conf.xml',
+        'views/login_templates.xml',
     ],
 
 }
