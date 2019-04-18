@@ -12,8 +12,8 @@
     'application': True,
     'auto_install': False,
     'data': [
-        'security/ir.model.access.csv',
         'security/alipay_groups.xml',
+        'security/ir.model.access.csv',
         'data/system_conf.xml',
         'views/menu.xml',
         'views/res_config_settings_views.xml',
