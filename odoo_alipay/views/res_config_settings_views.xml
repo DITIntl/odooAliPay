@@ -51,12 +51,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-12 o_setting_box">
+                        <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_right_pane">
-                                <field name="alipay_sign" placeholder="应用私钥!"/>
+                                <field name="alipay_sign" placeholder="开发者应用私钥!"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <label for="alipay_sign"/>
+                                <div class="text-muted">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <field name="alipay_public_key" placeholder="蚂蚁金服开放平台公钥"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="alipay_public_key"/>
                                 <div class="text-muted">
                                 </div>
                             </div>

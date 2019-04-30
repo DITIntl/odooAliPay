@@ -3,12 +3,8 @@ import logging
 from odoo import http, _
 from odoo.addons.web.controllers.main import Home
 from odoo.http import request
-from urllib.parse import quote
-
-import traceback
 from alipay.aop.api.AlipayClientConfig import AlipayClientConfig
 from alipay.aop.api.DefaultAlipayClient import DefaultAlipayClient
-from alipay.aop.api.domain.AlipayTradePayModel import AlipayTradePayModel
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,47 +35,29 @@ class AliPayLogin(Home, http.Controller):
         支付宝登录回调方法
         """
         auth_code = request.params['auth_code']
-        logging.info('----支付宝登录回调方法-----------')
-        logging.info('auth_code:{}'.format(auth_code))
-        logging.info('--------------------------')
+        logging.info('>>>auth_code:{}'.format(auth_code))
         # 用得到的auth_code换取access_token及用户userId
-        alipay_gateway = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_gateway')
-        alipay_appid = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_appid')
-        alipay_sign = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_sign')
-        alipay_aes = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_aes')
-        self.get_access_token_and_userid(alipay_gateway, alipay_appid, alipay_sign, alipay_aes, auth_code)
+        alipay_client_config = AlipayClientConfig()
+        alipay_client_config.server_url = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_gateway')
+        alipay_client_config.app_id = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_appid')
+        alipay_client_config.encrypt_key = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_aes')
+        alipay_client_config.app_private_key = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_sign')
+        alipay_client_config.alipay_public_key = request.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_public_key')
+        self.get_access_token_and_userid(alipay_client_config, auth_code)
 
-    def get_access_token_and_userid(self, alipay_gateway, alipay_appid, alipay_sign, alipay_aes, auth_code):
+    def get_access_token_and_userid(self, alipay_client_config, auth_code):
         """
         设置配置，包括支付宝网关地址、app_id、应用私钥、支付宝公钥等，其他配置值可以查看AlipayClientConfig的定义。
         """
-        alipay_client_config = AlipayClientConfig()
-        print(alipay_gateway)
-        print(alipay_appid)
-        print(alipay_sign)
-        print(alipay_aes)
-        print("-----------------")
-        alipay_client_config.server_url = alipay_gateway
-        alipay_client_config.app_id = alipay_appid
-        alipay_client_config.app_private_key = alipay_aes
-        alipay_client_config.alipay_public_key = alipay_sign
-        """
-        得到客户端对象。
-        注意，一个alipay_client_config对象对应一个DefaultAlipayClient，定义DefaultAlipayClient对象后，alipay_client_config不得修改，
-        如果想使用不同的配置，请定义不同的DefaultAlipayClient。logger参数用于打印日志，不传则不打印，建议传递。
-        """
         client = DefaultAlipayClient(alipay_client_config=alipay_client_config)
         """
-        系统接口示例：alipay.trade.pay
+        系统接口：alipay.system.oauth.token
         """
-        #     # 对照接口文档，构造请求对象
-        #     alipay.system.oauth.token
-
+        # 对照接口文档，构造请求对象
         from alipay.aop.api.request.AlipaySystemOauthTokenRequest import AlipaySystemOauthTokenRequest
-        from alipay.aop.api.response.AlipaySystemOauthTokenResponse import AlipaySystemOauthTokenResponse
         model = AlipaySystemOauthTokenRequest()
         model.grant_type = "authorization_code"
         model.code = auth_code
         result = client.execute(model)
-        print(result)
+        logging.info(">>>支付宝返回结果:{}".format(result))
 
