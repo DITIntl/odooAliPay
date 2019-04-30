@@ -36,10 +36,10 @@
     </record>
 
     <menuitem id="alipay_merchant_account_menu" name="商户账号列表"
-              parent="alipay.configure_menu"
+              parent="odoo_alipay.configure_menu"
               sequence="2"
               action="alipay_merchant_account_action"
-              groups="alipay.alipay_manager_group"
+              groups="odoo_alipay.alipay_manager_group"
     />
 
 </odoo>

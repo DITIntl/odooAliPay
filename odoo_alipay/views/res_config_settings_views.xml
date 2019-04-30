@@ -7,8 +7,8 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block alipay_settings_block" string="支付宝" data-string="支付宝" data-key="alipay"
-                     groups="alipay.alipay_manager_group">
+                <div class="app_settings_block alipay_settings_block" string="支付宝" data-string="支付宝" data-key="odoo_alipay"
+                     groups="odoo_alipay.alipay_manager_group">
                     <h2>支付宝开放平台信息</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-12 col-lg-6 o_setting_box">
@@ -73,14 +73,14 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module' : 'alipay'}</field>
+        <field name="context">{'module' : 'odoo_alipay'}</field>
     </record>
 
     <menuitem id="alipay_config_settings_settings" name="基础设置"
-              parent="alipay.configure_menu"
+              parent="odoo_alipay.configure_menu"
               sequence="1"
               action="alipay_settings_configuration_action"
-              groups="alipay_manager_group"
+              groups="odoo_alipay.alipay_manager_group"
     />
 
 </odoo>

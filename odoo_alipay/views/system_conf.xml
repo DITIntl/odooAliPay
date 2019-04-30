@@ -33,10 +33,10 @@
     </record>
 
     <menuitem id="alipay_system_conf_menu" name="系统参数列表"
-              parent="alipay.configure_menu"
+              parent="odoo_alipay.configure_menu"
               sequence="5"
               action="alipay_system_conf_action"
-              groups="alipay.alipay_manager_group"
+              groups="odoo_alipay.alipay_manager_group"
     />
 
 </odoo>
