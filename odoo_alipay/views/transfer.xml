@@ -28,6 +28,8 @@
                         <button name="summit_transfer" type="object" string="转账" class="oe_highlight"
                                 attrs="{'invisible': [('state', '!=', '00')]}"
                                 confirm="确认提交转账信息吗？"/>
+                        <button name="transfer_result" type="object" string="查询转账结果" states="01,02,03"
+                                class="oe_highlight"/>
                         <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
                     </header>
                     <sheet>

@@ -6,6 +6,8 @@ from alipay.aop.api.AlipayClientConfig import AlipayClientConfig
 from alipay.aop.api.DefaultAlipayClient import DefaultAlipayClient
 from alipay.aop.api.request.AlipayFundTransToaccountTransferRequest import AlipayFundTransToaccountTransferRequest
 from alipay.aop.api.domain.AlipayFundTransToaccountTransferModel import AlipayFundTransToaccountTransferModel
+from alipay.aop.api.request.AlipayFundTransOrderQueryRequest import AlipayFundTransOrderQueryRequest
+from alipay.aop.api.domain.AlipayFundTransOrderQueryModel import AlipayFundTransOrderQueryModel
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
@@ -58,14 +60,7 @@ class AliPayTransfer(models.Model):
         :return:
         """
         for res in self:
-            alipay_client_config = AlipayClientConfig()
-            alipay_client_config.server_url = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_gateway')
-            alipay_client_config.app_id = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_appid')
-            alipay_client_config.encrypt_key = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_aes')
-            alipay_client_config.app_private_key = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_sign')
-            alipay_client_config.alipay_public_key = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_public_key')
-            client = DefaultAlipayClient(alipay_client_config=alipay_client_config)
-
+            client = self.get_config_client()
             transfer_model = AlipayFundTransToaccountTransferModel()
             transfer_model.out_biz_no = res.out_biz_no  # 编号
             transfer_model.payee_type = res.payee_type  # 收款方账户类型
@@ -84,10 +79,37 @@ class AliPayTransfer(models.Model):
             result = json.loads(result, 'utf-8')
             if result.get('code') != '10000':
                 raise UserError("转账失败！原因为:{}".format(result.get('sub_msg')))
-            elif result.get('code') == '10000':
+            else:
                 res.write({'state': '02', 'pay_date': datetime.datetime.now(), 'order_id': result.get('order_id')})
                 res.message_post(body=result.get('msg'), message_type='notification')
-            else:
-                res.write({'state': '01'})
-                res.message_post(body="操作失败！请使用查询功能", message_type='notification')
 
+    @api.multi
+    def transfer_result(self):
+        for res in self:
+            client = self.get_config_client()
+            transfer_model = AlipayFundTransOrderQueryModel()
+            transfer_model.out_biz_no = res.out_biz_no
+            transfer_request = AlipayFundTransOrderQueryRequest(transfer_model)
+            result = client.execute(transfer_request)
+            logging.info(">>>支付宝查询转账结果:{}".format(result))
+            result = json.loads(result, 'utf-8')
+            if result.get('code') != '10000':
+                raise UserError("查询失败！原因为:{}".format(result.get('sub_msg')))
+            else:
+                if result.get('status') == 'SUCCESS':
+                    res.write({'state': '02', 'pay_date': datetime.datetime.now(), 'order_id': result.get('order_id')})
+                    res.message_post(body="交易已成功! {}".format(result.get('status')), message_type='notification')
+                else:
+                    res.message_post(body="交易未成功!详情:{}".format(result), message_type='notification')
+
+    @api.model
+    def get_config_client(self):
+        alipay_client_config = AlipayClientConfig()
+        alipay_client_config.server_url = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_gateway')
+        alipay_client_config.app_id = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_appid')
+        alipay_client_config.encrypt_key = self.env['ir.config_parameter'].sudo().get_param('odoo_alipay.alipay_aes')
+        alipay_client_config.app_private_key = self.env['ir.config_parameter'].sudo().get_param(
+            'odoo_alipay.alipay_sign')
+        alipay_client_config.alipay_public_key = self.env['ir.config_parameter'].sudo().get_param(
+            'odoo_alipay.alipay_public_key')
+        return DefaultAlipayClient(alipay_client_config=alipay_client_config)
