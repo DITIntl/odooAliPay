@@ -6,8 +6,22 @@
                   id="odoo_alipay.main_menu"
                   web_icon="odoo_alipay,static/description/icon.png"/>
 
-        <menuitem name="设置" id="odoo_alipay.configure_menu"
-                  parent="odoo_alipay.main_menu" sequence="100"
+        <menuitem name="会员"
+                  id="alipay_member_menu"
+                  parent="odoo_alipay.main_menu"
+                  sequence="3"
+        />
+
+        <menuitem name="支付"
+                  id="alipay_pay_menu"
+                  parent="odoo_alipay.main_menu"
+                  sequence="5"
+        />
+
+        <menuitem name="设置"
+                  id="odoo_alipay.configure_menu"
+                  parent="odoo_alipay.main_menu"
+                  sequence="100"
         />
 
     </data>

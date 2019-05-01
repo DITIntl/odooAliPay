@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--联系人-->
+    <record id="odoo_alipay.partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <newline/>
+                <field name="alipay_user_id" placeholder="支付宝用户号"/>
+                <field name="alipay_account" placeholder="登录邮箱/手机号"/>
+                <field name="alipay_real_name" placeholder="真实姓名"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
