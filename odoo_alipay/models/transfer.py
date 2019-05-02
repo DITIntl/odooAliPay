@@ -25,10 +25,10 @@ class AliPayTransfer(models.Model):
         ('ALIPAY_LOGONID', '邮箱和手机号')
     ]
     out_biz_no = fields.Char(string='订单编号')
-    payee_type = fields.Selection(string=u'收款方账户类型', selection=PAYEETYPE, default='ALIPAY_LOGONID')
+    payee_type = fields.Selection(string=u'收款方账户类型', selection=PAYEETYPE, default='ALIPAY_LOGONID', required=True)
     payee_account = fields.Many2one(comodel_name='res.partner', string=u'收款账户',
-                                    domain=[('alipay_account', '!=', ''), ('alipay_user_id', '!=', '')])
-    amount = fields.Float(string=u'转账金额', digits=(13, 2), default=0.0)
+                                    domain=[('alipay_account', '!=', ''), ('alipay_user_id', '!=', '')], required=True)
+    amount = fields.Float(string=u'转账金额', digits=(13, 2), default=0.0, required=True)
     payer_show_name = fields.Char(string='付款方名称')
     payee_real_name = fields.Char(string='收款方真实姓名')
     remark = fields.Text(string=u'转账备注')

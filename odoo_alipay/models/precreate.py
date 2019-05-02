@@ -22,8 +22,8 @@ class AliPayPrecreate(models.Model):
     _rec_name = 'out_biz_no'
 
     out_biz_no = fields.Char(string='订单编号')
-    subject = fields.Char(string=u'订单标题')
-    total_amount = fields.Float(string=u'订单总金额', digits=(13, 2), default=0.0)
+    subject = fields.Char(string=u'订单标题', required=True)
+    total_amount = fields.Float(string=u'订单总金额', digits=(13, 2), default=0.0, required=True)
     line_ids = fields.One2many(comodel_name='alipay.precreate.line', inverse_name='precreate_id', string=u'商品列表')
     company_id = fields.Many2one(comodel_name='res.company', string=u'公司',
                                  default=lambda self: self.env.user.company_id.id)
@@ -31,7 +31,7 @@ class AliPayPrecreate(models.Model):
                              default='00')
     precreate_time = fields.Datetime(string=u'生成交易时间')
     pay_time = fields.Datetime(string=u'支付确认时间')
-    body = fields.Text(string=u'备注')
+    body = fields.Text(string=u'备注', required=True)
     qr_code = fields.Char(string='二维码码串')
     trade_no = fields.Char(string='支付宝交易号')
     alipay_user = fields.Many2one(comodel_name='alipay.users', string=u'支付用户')
@@ -135,10 +135,10 @@ class AliPayPrecreateProduct(models.Model):
     _rec_name = 'precreate_id'
 
     precreate_id = fields.Many2one(comodel_name='alipay.precreate', string=u'当面付', ondelete='cascade')
-    product_id = fields.Many2one(comodel_name='product.template', string=u'产品')
-    goods_id = fields.Char(string='产品编号')
-    quantity = fields.Integer(string='数量')
-    price = fields.Float(string='单价', digits=(13, 2), default=0.0)
+    product_id = fields.Many2one(comodel_name='product.template', string=u'产品', required=True)
+    goods_id = fields.Char(string='产品编号', required=True)
+    quantity = fields.Integer(string='数量', required=True)
+    price = fields.Float(string='单价', digits=(13, 2), default=0.0, required=True)
 
 
 class AliPayPrecreateQrCode(models.TransientModel):
