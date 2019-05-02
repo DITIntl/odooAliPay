@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="alipay_precreate_tree_view" model="ir.ui.view">
+            <field name="name">当面付</field>
+            <field name="model">alipay.precreate</field>
+            <field name="arch" type="xml">
+                <tree default_order="id desc">
+                    <field name="out_biz_no"/>
+                    <field name="trade_no"/>
+                    <field name="subject"/>
+                    <field name="total_amount"/>
+                    <field name="precreate_time"/>
+                    <field name="pay_time"/>
+                    <field name="company_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="alipay_precreate_form_view" model="ir.ui.view">
+            <field name="name">当面付</field>
+            <field name="model">alipay.precreate</field>
+            <field name="arch" type="xml">
+                <form string="当面付">
+                    <header>
+                        <button name="summit_precreate" type="object" string="创建预交易" class="oe_highlight" states="00"/>
+                        <button name="open_qr_code" type="object" string="二维码付款" states="01" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <h3>
+                            <field name="out_biz_no" attrs="{'readonly': [('state', '!=', 'no')]}"/>
+                        </h3>
+                        <group>
+                            <group>
+                                <field name="subject" attrs="{'readonly': [('state', '!=', '00')]}"
+                                       placeholder="订单标题"/>
+                            </group>
+                            <group>
+                                <field name="total_amount" attrs="{'readonly': [('state', '!=', '00')]}"
+                                       placeholder="订单总金额"/>
+                            </group>
+                            <field name="body" attrs="{'readonly': [('state', '!=', '00')]}" placeholder="描述或备注"/>
+                        </group>
+                        <field name="line_ids" model="tree">
+                            <tree editable="top">
+                                <field name="product_id" options="{'horizontal': true, 'no_create_edit': True}"/>
+                                <field name="goods_id"/>
+                                <field name="quantity"/>
+                                <field name="price"/>
+                            </tree>
+                        </field>
+                        <group>
+                            <group>
+                                <field name="precreate_time" attrs="{'readonly': [('state', '!=', 'no')]}"/>
+                                <field name="pay_time" attrs="{'readonly': [('state', '!=', 'no')]}"/>
+                            </group>
+                            <group>
+                                <field name="create_uid" string="创建人"/>
+                                <field name="create_date" string="创建时间"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="alipay_precreate_action">
+            <field name="name">当面付</field>
+            <field name="res_model">alipay.precreate</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="当面付"
+                  id="alipay_precreate_main_menu"
+                  parent="alipay_pay_menu"
+                  action="alipay_precreate_action"
+                  sequence="3"/>
+
+
+        <record id="odoo_alipay.alipay_precreate_qr_code_form" model="ir.ui.view">
+            <field name="name">付款二维码界面</field>
+            <field name="model">alipay.precreate.qr.code</field>
+            <field name="arch" type="xml">
+                <form class="o_share_form">
+                    <sheet class="o_share_sheet">
+                        <group>
+                            <group>
+                                <field name="out_biz_no" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="subject" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <h2>请使用手机支付宝扫一扫完成支付</h2>
+                        </group>
+                        <field name="image" widget="image" class="oe_avatar"
+                               options="{'preview_image': 'image_medium', 'size': [300, 300]}" readonly="1"/>
+                        <footer>
+                            <button name="precreate" type="object" string="已支付" class="btn btn-primary"/>
+                            <button string="取消" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="alipay_precreate_qr_code_action" model="ir.actions.act_window">
+            <field name="name">付款二维码</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alipay.precreate.qr.code</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

@@ -10,5 +10,13 @@
             <field name="padding">4</field>
         </record>
 
+        <record id="alipay_precreate_group_number" model="ir.sequence">
+            <field name="name">当面付编码规则</field>
+            <field name="code">alipay.precreate.code</field>
+            <field name="prefix">SPC%(year)s%(month)s%(day)s</field>
+            <field name="suffix"/>
+            <field name="padding">4</field>
+        </record>
+
     </data>
 </odoo>

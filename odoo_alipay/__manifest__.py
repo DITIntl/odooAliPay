@@ -7,7 +7,7 @@
     'website': "https://www.sxfblog.com",
     'category': 'alipay',
     'version': '1.0',
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'product'],
     'installable': True,
     'application': True,
     'auto_install': False,
@@ -23,6 +23,7 @@
         'views/system_conf.xml',
         'views/login_templates.xml',
         'views/transfer.xml',
+        'views/precreate.xml',
     ],
 
 }

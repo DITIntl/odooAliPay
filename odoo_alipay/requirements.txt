@@ -1,1 +1,2 @@
 alipay-sdk-python >= 3.3.17
+qrcode

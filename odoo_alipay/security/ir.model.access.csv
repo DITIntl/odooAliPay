@@ -1,6 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_alipay_merchant_account_user,alipay.merchant.account.user,model_alipay_merchant_account,odoo_alipay.alipay_user_group,1,0,0,0
 access_alipay_system_conf_user,alipay.system.conf.user,model_alipay_system_conf,odoo_alipay.alipay_user_group,1,0,0,1
+access_alipay_users,alipay.users,model_alipay_users,odoo_alipay.alipay_user_group,1,1,1,1
 access_alipay_merchant_account_manage,alipay.merchant.account.manage,model_alipay_merchant_account,odoo_alipay.alipay_manager_group,1,1,1,1
 access_alipay_system_conf_manage,alipay.system.conf.manage,model_alipay_system_conf,odoo_alipay.alipay_manager_group,1,1,1,0
 access_alipay_transfer,alipay.transfer,model_alipay_transfer,odoo_alipay.alipay_user_group,1,1,1,1
+access_alipay_precreate,alipay.precreate,model_alipay_precreate,odoo_alipay.alipay_user_group,1,1,1,1
+access_alipay_precreate_line,alipay.precreate.line,model_alipay_precreate_line,odoo_alipay.alipay_user_group,1,1,1,1
