@@ -26,7 +26,8 @@
                     <header>
                         <button name="summit_precreate" type="object" string="创建预交易" class="oe_highlight" states="00"/>
                         <button name="open_qr_code" type="object" string="二维码付款" states="01" class="oe_highlight"/>
-                        <button name="find_precreate_result" type="object" string="查询交易" states="01,02,03" class="oe_highlight"/>
+                        <button name="find_precreate_result" type="object" string="查询交易" states="01,02,03"
+                                class="oe_highlight"/>
                         <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
                     </header>
                     <sheet>
@@ -75,6 +76,29 @@
             <field name="name">当面付</field>
             <field name="res_model">alipay.precreate</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_group_by_state': True}</field>
+        </record>
+
+        <record model="ir.ui.view" id="alipay_precreate_search">
+            <field name="model">alipay.precreate</field>
+            <field name="arch" type="xml">
+                <search string="当面付">
+                    <field name="out_biz_no"/>
+                    <field name="trade_no"/>
+                    <field name="subject"/>
+                    <field name="total_amount"/>
+                    <field name="precreate_time"/>
+                    <field name="pay_time"/>
+                    <field name="company_id"/>
+                    <field name="state"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_state" string="交易状态" domain="[]"
+                                context="{'group_by':'state'}"/>
+                        <filter name="group_by_company_id" string="公司" domain="[]"
+                                context="{'group_by':'company_id'}"/>
+                    </group>
+                </search>
+            </field>
         </record>
 
         <menuitem name="当面付"

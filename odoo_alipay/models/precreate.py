@@ -31,7 +31,7 @@ class AliPayPrecreate(models.Model):
                              default='00')
     precreate_time = fields.Datetime(string=u'生成交易时间')
     pay_time = fields.Datetime(string=u'支付确认时间')
-    body = fields.Text(string=u'备注', required=True)
+    body = fields.Text(string=u'备注')
     qr_code = fields.Char(string='二维码码串')
     trade_no = fields.Char(string='支付宝交易号')
     alipay_user = fields.Many2one(comodel_name='alipay.users', string=u'支付用户')
