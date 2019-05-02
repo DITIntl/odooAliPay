@@ -83,6 +83,51 @@ class AliPayPrecreate(models.Model):
             }
             return action
 
+    @api.multi
+    def find_precreate_result(self):
+        for res in self:
+            client = self.env['alipay.transfer'].get_config_client()
+            alipay_model = AlipayTradeQueryModel()
+            alipay_model.out_trade_no = res.out_biz_no  # 编号
+            alipay_request = AlipayTradeQueryRequest(alipay_model)
+            result = client.execute(alipay_request)
+            logging.info(">>>支付宝查询交易结果:{}".format(result))
+            result = json.loads(result, 'utf-8')
+            if result.get('code') == '10000':
+                if result.get('trade_status') == 'WAIT_BUYER_PAY':
+                    res.message_post(body="等待买家付款", message_type='notification')
+                elif result.get('trade_status') == 'TRADE_CLOSED':
+                    res.message_post(body="未付款交易超时关闭，或支付完成后全额退款", message_type='notification')
+                    res.write({
+                        'state': '03',
+                        'pay_time': datetime.datetime.now(),
+                    })
+                elif result.get('trade_status') == 'TRADE_SUCCESS':
+                    res.message_post(body="交易支付成功", message_type='notification')
+                    user = self.create_alipay_user(result)
+                    res.write({
+                        'state': '02',
+                        'pay_time': datetime.datetime.now(),
+                        'trade_no': result.get('trade_no'),
+                        'alipay_user': user.id,
+                    })
+                elif result.get('trade_status') == 'TRADE_FINISHED':
+                    res.message_post(body="交易结束，不可退款", message_type='notification')
+            else:
+                res.message_post(body="等待扫码付款...", message_type='notification')
+
+    @api.model
+    def create_alipay_user(self, result):
+        user = self.env['alipay.users'].sudo().search([('user_id', '=', result.get('buyer_user_id'))])
+        if not user:
+            return self.env['alipay.users'].sudo().create({
+                'name': result.get('buyer_logon_id'),
+                'login_id': result.get('buyer_logon_id'),
+                'user_id': result.get('buyer_user_id'),
+                'user_type': result.get('buyer_user_type')
+            })
+        return user[0]
+
 
 class AliPayPrecreateProduct(models.Model):
     _name = 'alipay.precreate.line'
@@ -136,7 +181,8 @@ class AliPayPrecreateQrCode(models.TransientModel):
         )
         qr.add_data(data=qr_code_url)
         qr.make(fit=True)
-        img = qr.make_image(fill_color="red", back_color="white")
+        # img = qr.make_image(fill_color="red", back_color="white")
+        img = qr.make_image(fill_color="green", back_color="white")
         filename = "precreate_img.png"
         # img = qrcode.make(qr_code_url)
         img.save(filename)
@@ -187,5 +233,6 @@ class AliPayPrecreateQrCode(models.TransientModel):
                 'user_id': result.get('buyer_user_id'),
                 'user_type': result.get('buyer_user_type')
             })
+        return user[0]
 
 
