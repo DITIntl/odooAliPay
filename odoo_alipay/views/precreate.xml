@@ -44,7 +44,7 @@
                             </group>
                             <field name="body" attrs="{'readonly': [('state', '!=', '00')]}" placeholder="描述或备注"/>
                         </group>
-                        <field name="line_ids" model="tree">
+                        <field name="line_ids" model="tree" attrs="{'readonly': [('state', '!=', '00')]}">
                             <tree editable="top">
                                 <field name="product_id" options="{'horizontal': true, 'no_create_edit': True}"/>
                                 <field name="goods_id"/>
