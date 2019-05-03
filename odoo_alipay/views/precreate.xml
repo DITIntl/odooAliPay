@@ -26,6 +26,9 @@
                     <header>
                         <button name="summit_precreate" type="object" string="创建预交易" class="oe_highlight" states="00"/>
                         <button name="open_qr_code" type="object" string="二维码付款" states="01" class="oe_highlight"/>
+                        <button name="cancel_precreate" type="object" string="撤销交易" states="01,03" class="oe_highlight"/>
+                        <button name="close_precreate" type="object" string="关闭交易" states="01" class="oe_highlight"/>
+                        <button name="refund_precreate" type="object" string="退款" states="02" class="oe_highlight"/>
                         <button name="find_precreate_result" type="object" string="查询交易" states="01,02,03"
                                 class="oe_highlight"/>
                         <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
@@ -140,6 +143,42 @@
             <field name="name">付款二维码</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">alipay.precreate.qr.code</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="odoo_alipay.alipay_precreate_refund_form" model="ir.ui.view">
+            <field name="name">退款</field>
+            <field name="model">alipay.precreate.refund</field>
+            <field name="arch" type="xml">
+                <form class="o_share_form">
+                    <sheet class="o_share_sheet">
+                        <group>
+                            <group>
+                                <field name="out_biz_no" readonly="1"/>
+                                <field name="subject" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="total_amount" readonly="1"/>
+                                <field name="refund_amount" placeholder="请输入退款金额..."/>
+                            </group>
+                            <field name="refund_reason" placeholder="请描述退款原因..."/>
+                        </group>
+                        <footer>
+                            <button name="refund" type="object" string="确认" class="btn btn-primary"/>
+                            <button string="取消" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="alipay_precreate_refund_action" model="ir.actions.act_window">
+            <field name="name">退款</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alipay.precreate.refund</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>

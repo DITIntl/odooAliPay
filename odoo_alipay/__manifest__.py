@@ -22,6 +22,7 @@
         'views/res_partner.xml',
         'views/system_conf.xml',
         'views/login_templates.xml',
+        'views/alipay_user.xml',
         'views/transfer.xml',
         'views/precreate.xml',
     ],

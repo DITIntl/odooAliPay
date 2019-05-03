@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="alipay_users_tree_view" model="ir.ui.view">
+            <field name="name">用户/会员列表</field>
+            <field name="model">alipay.users</field>
+            <field name="arch" type="xml">
+                <tree default_order="id desc">
+                    <field name="name"/>
+                    <field name="login_id"/>
+                    <field name="user_id"/>
+                    <field name="user_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="alipay_users_form_view" model="ir.ui.view">
+            <field name="name">用户/会员列表</field>
+            <field name="model">alipay.users</field>
+            <field name="arch" type="xml">
+                <form string="用户/会员列表">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" placeholder=""/>
+                                <field name="login_id" placeholder=""/>
+                            </group>
+                            <group>
+                                <field name="user_id" placeholder=""/>
+                                <field name="user_type" placeholder=""/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="alipay_users_action">
+            <field name="name">用户/会员列表</field>
+            <field name="res_model">alipay.users</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.ui.view" id="alipay_users_search">
+            <field name="model">alipay.users</field>
+            <field name="arch" type="xml">
+                <search string="用户/会员列表">
+                    <field name="name"/>
+                    <field name="login_id"/>
+                    <field name="user_id"/>
+                    <field name="user_type"/>
+                </search>
+            </field>
+        </record>
+
+        <menuitem name="用户/会员列表"
+                  id="alipay_users_menu"
+                  parent="alipay_member_menu"
+                  action="alipay_users_action"
+                  sequence="1"/>
+
+    </data>
+</odoo>

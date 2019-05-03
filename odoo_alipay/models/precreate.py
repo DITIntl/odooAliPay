@@ -5,10 +5,16 @@ import json
 import logging
 import os
 import qrcode
+from alipay.aop.api.domain.AlipayTradeCancelModel import AlipayTradeCancelModel
+from alipay.aop.api.domain.AlipayTradeCloseModel import AlipayTradeCloseModel
+from alipay.aop.api.domain.AlipayTradeRefundModel import AlipayTradeRefundModel
+from alipay.aop.api.request.AlipayTradeCancelRequest import AlipayTradeCancelRequest
+from alipay.aop.api.request.AlipayTradeCloseRequest import AlipayTradeCloseRequest
 from alipay.aop.api.request.AlipayTradePrecreateRequest import AlipayTradePrecreateRequest
 from alipay.aop.api.domain.AlipayTradePrecreateModel import AlipayTradePrecreateModel
 from alipay.aop.api.request.AlipayTradeQueryRequest import AlipayTradeQueryRequest
 from alipay.aop.api.domain.AlipayTradeQueryModel import AlipayTradeQueryModel
+from alipay.aop.api.request.AlipayTradeRefundRequest import AlipayTradeRefundRequest
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
@@ -21,14 +27,23 @@ class AliPayPrecreate(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'out_biz_no'
 
+    PRECREATESTATE = [
+        ('00', '草稿'),
+        ('01', '预交易'),
+        ('04', '撤销'),
+        ('05', '关闭'),
+        ('06', '退款'),
+        ('02', '成功'),
+        ('03', '失败'),
+    ]
+
     out_biz_no = fields.Char(string='订单编号')
     subject = fields.Char(string=u'订单标题', required=True)
     total_amount = fields.Float(string=u'订单总金额', digits=(13, 2), default=0.0, required=True)
     line_ids = fields.One2many(comodel_name='alipay.precreate.line', inverse_name='precreate_id', string=u'商品列表')
     company_id = fields.Many2one(comodel_name='res.company', string=u'公司',
                                  default=lambda self: self.env.user.company_id.id)
-    state = fields.Selection(string=u'状态', selection=[('00', '草稿'), ('01', '预交易'), ('02', '已支付'), ('03', '未支付')],
-                             default='00')
+    state = fields.Selection(string=u'状态', selection=PRECREATESTATE, default='00')
     precreate_time = fields.Datetime(string=u'生成交易时间')
     pay_time = fields.Datetime(string=u'支付确认时间')
     body = fields.Text(string=u'备注')
@@ -59,7 +74,7 @@ class AliPayPrecreate(models.Model):
                     'quantity': pro.quantity,
                     'price': pro.price,
                 })
-            transfer_model.goods_detail = pro_list   # 商品列表
+            transfer_model.goods_detail = pro_list  # 商品列表
             transfer_request = AlipayTradePrecreateRequest(transfer_model)
             result = client.execute(transfer_request)
             logging.info(">>>支付宝预交易结果:{}".format(result))
@@ -127,6 +142,66 @@ class AliPayPrecreate(models.Model):
                 'user_type': result.get('buyer_user_type')
             })
         return user[0]
+
+    @api.multi
+    def cancel_precreate(self):
+        for res in self:
+            client = self.env['alipay.transfer'].get_config_client()
+            alipay_model = AlipayTradeCancelModel()
+            alipay_model.out_trade_no = res.out_biz_no  # 编号
+            alipay_request = AlipayTradeCancelRequest(alipay_model)
+            result = client.execute(alipay_request)
+            logging.info(">>>支付宝撤销交易结果:{}".format(result))
+            result = json.loads(result, 'utf-8')
+            if result.get('code') == '10000':
+                if result.get('action') == 'close':
+                    res.message_post(body="交易已撤销，无退款请求", message_type='notification')
+                    res.write({
+                        'state': '05',
+                        'pay_time': datetime.datetime.now(),
+                    })
+                elif result.get('action') == 'refund':
+                    res.message_post(body="关闭已撤销并已产生了退款请求！", message_type='notification')
+                    res.write({
+                        'state': '06',
+                        'pay_time': datetime.datetime.now(),
+                    })
+                else:
+                    res.message_post(body="已撤销本次交易！", message_type='notification')
+                    res.write({
+                        'state': '04',
+                        'pay_time': datetime.datetime.now(),
+                    })
+            else:
+                raise UserError("操作失败！原因为:{}".format(result.get('sub_msg')))
+
+    @api.multi
+    def close_precreate(self):
+        for res in self:
+            client = self.env['alipay.transfer'].get_config_client()
+            alipay_model = AlipayTradeCloseModel()
+            alipay_model.out_trade_no = res.out_biz_no  # 订单编号
+            alipay_request = AlipayTradeCloseRequest(alipay_model)
+            result = client.execute(alipay_request)
+            logging.info(">>>支付宝关闭交易结果:{}".format(result))
+            result = json.loads(result, 'utf-8')
+            if result.get('code') == '10000':
+                res.message_post(body="交易已关闭", message_type='notification')
+                res.write({
+                    'state': '05',
+                    'pay_time': datetime.datetime.now(),
+                })
+            else:
+                raise UserError("操作失败！原因为:{}".format(result.get('sub_msg')))
+
+    @api.multi
+    def refund_precreate(self):
+        for res in self:
+            action = self.env.ref('odoo_alipay.alipay_precreate_refund_action').read()[0]
+            action['context'] = {
+                'precreate_id': res.id,
+            }
+            return action
 
 
 class AliPayPrecreateProduct(models.Model):
@@ -236,3 +311,52 @@ class AliPayPrecreateQrCode(models.TransientModel):
         return user[0]
 
 
+class AliPayPrecreateRefund(models.TransientModel):
+    _name = 'alipay.precreate.refund'
+    _description = "扫码支付退款"
+    _rec_name = 'out_biz_no'
+
+    out_biz_no = fields.Char(string='订单编号')
+    subject = fields.Char(string=u'订单标题')
+    total_amount = fields.Float(string=u'订单总金额', digits=(13, 2))
+    precreate_id = fields.Many2one(comodel_name='alipay.precreate', string=u'当面付', ondelete='cascade')
+    refund_amount = fields.Float(string=u'退款金额', digits=(13, 2), default=0.0, required=True)
+    refund_reason = fields.Text(string=u'退款原因', required=True)
+
+    @api.model
+    def default_get(self, fields):
+        """获取资产原有的信息"""
+        res = super(AliPayPrecreateRefund, self).default_get(fields)
+        precreate = self.env['alipay.precreate'].browse(self.env.context.get('precreate_id'))
+        res.update({
+            'precreate_id': precreate.id,
+            'total_amount': precreate.total_amount,
+            'out_biz_no': precreate.out_biz_no,
+            'subject': precreate.subject,
+        })
+        return res
+
+    @api.multi
+    def refund(self):
+        for res in self:
+            if res.refund_amount <= 0:
+                raise UserError("退款金额不能小于等于0！")
+            client = self.env['alipay.transfer'].get_config_client()
+            alipay_model = AlipayTradeRefundModel()
+            alipay_model.out_trade_no = res.out_biz_no  # 订单编号
+            alipay_model.refund_amount = res.refund_amount  # 退款金额
+            alipay_model.refund_reason = res.refund_reason  # 退款原因
+            alipay_request = AlipayTradeRefundRequest(alipay_model)
+            result = client.execute(alipay_request)
+            logging.info(">>>支付宝退款交易结果:{}".format(result))
+            result = json.loads(result, 'utf-8')
+            if result.get('code') == '10000':
+                res.precreate_id.message_post(
+                    body="已申请退款!退款金额：{},退款账户:{}".format(result.get('refund_fee'), result.get('buyer_logon_id')),
+                    message_type='notification')
+                res.precreate_id.write({
+                    'state': '06',
+                    'pay_time': datetime.datetime.now(),
+                })
+            else:
+                raise UserError("操作失败！原因为:{}".format(result.get('sub_msg')))
