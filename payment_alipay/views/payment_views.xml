@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="acquirer_form_alipay" model="ir.ui.view">
+            <field name="name">acquirer.form.alipay</field>
+            <field name="model">payment.acquirer</field>
+            <field name="inherit_id" ref="payment.acquirer_form"/>
+            <field name="arch" type="xml">
+                <xpath expr='//group[@name="acquirer"]' position='after'>
+                    <group attrs="{'invisible': [('provider', '!=', 'alipay')]}">
+                        <button name="get_alipay_setting" type="object" string="获取支付宝配置信息"/>
+                        <field name="alipay_appid"/>
+                        <field name="alipay_test_url"/>
+                        <field name="alipay_prod_url"/>
+                        <field name="alipay_aes"/>
+                        <field name="alipay_merchant_uid"/>
+                        <field name="alipay_sign"/>
+                        <field name="alipay_public_key"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="payment_alipay.payment_acquirer_alipay" model="payment.acquirer">
+            <field name="name">支付宝支付</field>
+            <field name="image" type="base64" file="payment_alipay/static/description/icon.png"/>
+            <field name="provider">alipay</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="view_template_id" ref="payment_alipay.alipay_form"/>
+            <field name="alipay_appid">****</field>
+            <field name="alipay_test_url">https://openapi.alipaydev.com/gateway.do</field>
+            <field name="alipay_prod_url">https://openapi.alipay.com/gateway.do</field>
+            <field name="alipay_aes">****</field>
+            <field name="alipay_merchant_uid">****</field>
+            <field name="alipay_sign">请拷贝私钥</field>
+            <field name="alipay_public_key">请支付宝公钥拷贝至此</field>
+            <field name="pre_msg"><![CDATA[<p>点击付款按钮后，您将被重定向到支付宝付款页面中.</p>]]></field>
+        </record>
+
+    </data>
+</odoo>
